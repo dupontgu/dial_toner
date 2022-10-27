@@ -1,0 +1,2 @@
+adafruit_hid/
+adafruit_pixelbuf.mpy
