@@ -9,6 +9,8 @@ load_dotenv()
 # - this project uses the version 7.X bundle!!!
 # - should point to the 'lib' directory within the library bundle
 cpy_lib_root = os.getenv("CIRCUITPY_LIBRARY_BUNDLE_ROOT")
+if cpy_lib_root is None:
+    raise Exception("You must supply path to CircuitPython library bundle as an environment variable: CIRCUITPY_LIBRARY_BUNDLE_ROOT")
 
 for bundle in ["basic", "ultra"]:
     path = os.path.join('bundle', bundle)

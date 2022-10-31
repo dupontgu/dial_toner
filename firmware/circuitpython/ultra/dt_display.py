@@ -7,13 +7,6 @@ from adafruit_bitmap_font import bitmap_font
 import board
 import time
 
-color_text_y_map = {
-    1 : 112,
-    2 : 90,
-    3 : 60,
-    4 : 30 
-}
-
 class DialTonerDisplay:
     def __init__(self):
         displayio.release_displays()
@@ -50,6 +43,8 @@ class DialTonerDisplay:
         self.logo = displayio.TileGrid(logo_bitmap, pixel_shader=self.logo_palette)
         self.logo_showing = False
         self.last_color_update = 0
+        self.last_display = None
+        self.dirty = False
 
     def update_bg_color(self, bg_color):
         now = time.monotonic()
@@ -60,14 +55,18 @@ class DialTonerDisplay:
         return False
 
     def show_logo(self):
-        self.color_text_label.text = ""
-        self.display.refresh()
-        self.display_group.append(self.logo)
-        self.logo_showing = True
+        if not self.logo_showing:
+            self.dirty = True
+            self.color_text_label.text = ""
+            self.display.refresh()
+            self.display_group.append(self.logo)
+            self.logo_showing = True
 
     def hide_logo(self):
-        self.display_group.pop()
-        self.logo_showing = False
+        if self.logo_showing:
+            self.dirty = True
+            self.display_group.pop()
+            self.logo_showing = False
 
     def update_text_color(self, bg_color):
         c = (0,0,0) if use_dark_text(bg_color) else (255,255,255)
@@ -75,15 +74,20 @@ class DialTonerDisplay:
         self.color_text_label.color = c
 
     def update_with(self, mode):
-        print(mode.as_rgb)
         c = mode.as_rgb
+        display = mode.display
+        if display == self.last_display:
+            return
+        self.last_display = display
+        self.dirty = True
         if self.update_bg_color(c):
             self.update_text_color(c)
-        display = mode.display
-        self.color_text_label.y = color_text_y_map[len(display)]
-        max_line = max([len(l) for l in display])
-        self.color_text_label.x = 5 + ((8 - max_line) * 13)
         self.color_text_label.text = "\n".join(display)
+        self.color_text_label.y = round((270 - self.color_text_label.height) / 2)
+        self.color_text_label.x = round((240 - self.color_text_label.width) / 2)
 
     def refresh(self):
-        self.display.refresh()
+        if self.dirty:
+            self.display.refresh()
+            self.dirty = False
+

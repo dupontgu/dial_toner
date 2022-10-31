@@ -7,6 +7,7 @@ CONF_OP_MODE = 2
 CONF_WS_MODE = 3
 CONF_APPEND_MODE = 4
 CONF_BRIGHTNESS = 5
+CONF_IP_MODE = 6
 
 # write this immediately
 # migrations can go here, if necessary
@@ -16,7 +17,8 @@ def write_config(config):
     microcontroller.nvm[CONF_OP_MODE] = config.output_mode
     microcontroller.nvm[CONF_WS_MODE] = config.whitespace_mode
     microcontroller.nvm[CONF_APPEND_MODE] = config.append_key
-    microcontroller.nvm[CONF_BRIGHTNESS] = round(config.brightness * 255)
+    microcontroller.nvm[CONF_BRIGHTNESS] = config.brightness
+    microcontroller.nvm[CONF_IP_MODE] = config.input_mode
 
 
 def read_config():
@@ -25,9 +27,10 @@ def read_config():
         return Config()
     whitespace_mode = microcontroller.nvm[CONF_WS_MODE]
     append_key = microcontroller.nvm[CONF_APPEND_MODE]
-    brightness = microcontroller.nvm[CONF_BRIGHTNESS] / 255.0
+    brightness = microcontroller.nvm[CONF_BRIGHTNESS]
+    input_mode = microcontroller.nvm[CONF_IP_MODE]
     return Config(
-        output_mode=output_mode, whitespace_mode=whitespace_mode, append_key=append_key, brightness=brightness
+        output_mode=output_mode, input_mode=input_mode, whitespace_mode=whitespace_mode, append_key=append_key, brightness=brightness
     )
 
 def get_reboot_button_count():

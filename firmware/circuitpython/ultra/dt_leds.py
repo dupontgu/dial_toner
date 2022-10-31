@@ -15,3 +15,7 @@ def set_knob_leds(colors):
     for i in range(4):
         pixels[4 - i] = colors[i]
     pixels.show()
+
+def set_all_led_brightness(brightness):
+    pixels.brightness = brightness
+    pixels.show()
