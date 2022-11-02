@@ -2,8 +2,10 @@ from color_util import *
 from modes import ALL_INPUT_MODES
 from dt_keyboard import ALL_KEYBOARD_MODES
 
+# Input modes: Hex, RGB, CMYK, P-Tone, etc.
 INPUT_VALS = ALL_INPUT_MODES
 
+# Keyboard layouts: US, UK, INTL
 KEYBOARD_VALS = ALL_KEYBOARD_MODES
 
 OUTPUT_VALS = [
@@ -53,7 +55,7 @@ class Config:
         self.keyboard_mode = keyboard_mode
 
     def __str__(self):
-        return "ip={}, op={}, ws={}, ak={}, bright={}".format(self._input_mode, self.output_mode, self.whitespace_mode, self.append_key, self.brightness)
+        return "ip={}, op={}, ws={}, ak={}, bright={}, kbd={}".format(self._input_mode, self.output_mode, self.whitespace_mode, self.append_key, self.brightness, self.keyboard_mode)
 
     def set_whitespace_mode(self, value):
         if value >= len(WHITESPACE_VALS):

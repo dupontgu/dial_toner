@@ -12,7 +12,11 @@ CONF_KEYBOARD_MODE = 7
 
 # write this immediately
 # migrations can go here, if necessary
-microcontroller.nvm[CONF_VERSION] = 1
+if microcontroller.nvm[CONF_VERSION] == 1:
+    # used to be stored from 0-255, reduced options from 0-10. Default to low-ish value.
+    microcontroller.nvm[CONF_BRIGHTNESS] = 3
+    print("migrating from persistance 1 -> 2")
+microcontroller.nvm[CONF_VERSION] = 2
 
 def write_config(config):
     microcontroller.nvm[CONF_OP_MODE] = config.output_mode

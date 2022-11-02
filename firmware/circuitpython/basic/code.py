@@ -8,6 +8,7 @@ import board
 from dt_keyboard import Keyboard
 from led_wrapper import LedWrapper
 from color_util import gamma_correction
+from config import BRIGHTNESS_VALS
 
 btn = PioButton(board.D0, sample_frequency = 10000)
 keyboard = Keyboard()
@@ -43,6 +44,7 @@ def commit_config_selection(bytes):
     config.whitespace_mode = bytes[0] & 0x0F
     config.append_key = bytes[1] >> 4
     config.brightness = get_brightness_from_bytes(bytes)
+    config.keyboard_mode = bytes[2] >> 4
     write_config(config)
     print(config)
 
