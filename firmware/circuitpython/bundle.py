@@ -1,14 +1,30 @@
 import os
 import shutil
 from dotenv import load_dotenv
+import requests
+import zipfile
 
 load_dotenv()
 
-# You must specify the directory for circuitpy library bundle 
+# You can specify the directory for circuitpy library bundle 
 # - downloaded from: https://circuitpython.org/libraries
 # - this project uses the version 7.X bundle!!!
 # - should point to the 'lib' directory within the library bundle
 cpy_lib_root = os.getenv("CIRCUITPY_LIBRARY_BUNDLE_ROOT")
+
+# If cpy_lib_root is NOT provided, the script will attempt to download the following archive from github
+library_archive_file = "adafruit-circuitpython-bundle-7.x-mpy-20221101"
+downloaded = False
+
+def download_cpy_bundle():
+    global downloaded
+    if not downloaded:
+        r = requests.get('https://github.com/adafruit/Adafruit_CircuitPython_Bundle/releases/download/20221101/' + library_archive_file + ".zip")
+        with open("cpy_zip.zip", "wb+") as cpy_zip:
+            cpy_zip.write(r.content)
+            with zipfile.ZipFile(cpy_zip) as local_zip:
+                local_zip.extractall()
+        downloaded = True
 
 for bundle in ["basic", "ultra"]:
     path = os.path.join('bundle', bundle)
@@ -27,12 +43,8 @@ for bundle in ["basic", "ultra"]:
     os.makedirs(lib_path, exist_ok=True)
 
     if cpy_lib_root is None:
-        with open(os.path.join(lib_path, "README.txt"), "w+") as f_open:
-            f_open.write("You will need to copy the following CircuitPython libraries into this directory:\n\n")
-            f_open.writelines(deps)
-            f_open.write("\n\nTo download these libraries, visit: https://circuitpython.org/libraries and download the bundle for version 7.x.\n")
-            f_open.write("If the library ends in '/', you should copy the entire directory.\n")
-        continue
+        download_cpy_bundle()
+        cpy_lib_root = os.path.join(library_archive_file, "lib")
 
     # copy all dependencies into bundle output dir
     for dep_line in deps:
@@ -44,5 +56,8 @@ for bundle in ["basic", "ultra"]:
             dest_path = os.path.join(lib_path, dep)
             os.makedirs(os.path.dirname(dest_path), exist_ok=True)
             shutil.copy(dep_path, dest_path)
+
+if downloaded:
+    shutil.rmtree(library_archive_file)
 
 print("CircuitPython bundle complete.")
