@@ -36,3 +36,5 @@ for bundle in ["basic", "ultra"]:
             dest_path = os.path.join(lib_path, dep)
             os.makedirs(os.path.dirname(dest_path), exist_ok=True)
             shutil.copy(dep_path, dest_path)
+
+print("CircuitPython bundle complete.")

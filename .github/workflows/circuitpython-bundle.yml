@@ -1,0 +1,13 @@
+name: Bundle CircuitPython Firmware
+on: [push]
+jobs:
+  Bundle:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+    - name: Python Bundle
+      working-directory: ./firmware/circuitpython
+      run: python bundle.py
