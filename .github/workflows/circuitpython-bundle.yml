@@ -5,9 +5,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Read Version
+      id: read_version
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: ./firmware/circuitpython/version.txt
     - uses: actions/setup-python@v4
       with:
         python-version: '3.10' 
+    - run: pip install python-dotenv
     - name: Python Bundle
       working-directory: ./firmware/circuitpython
       run: python bundle.py
+    - uses: actions/upload-artifact@v3
+      with:
+        name: DT Basic Bundle - ${{ steps.read_version.outputs.content }}
+        path: ./firmware/circuitpython/bundle/basic/
+    - uses: actions/upload-artifact@v3
+      with:
+        name: DT Ultra Bundle - ${{ steps.read_version.outputs.content }}
+        path: ./firmware/circuitpython/bundle/ultra/
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.read_version.outputs.content }}
+        release_name: Release ${{ steps.read_version.outputs.content }}
+        body: |
+          Artifacts can be found at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -9,8 +9,6 @@ load_dotenv()
 # - this project uses the version 7.X bundle!!!
 # - should point to the 'lib' directory within the library bundle
 cpy_lib_root = os.getenv("CIRCUITPY_LIBRARY_BUNDLE_ROOT")
-if cpy_lib_root is None:
-    raise Exception("You must supply path to CircuitPython library bundle as an environment variable: CIRCUITPY_LIBRARY_BUNDLE_ROOT")
 
 for bundle in ["basic", "ultra"]:
     path = os.path.join('bundle', bundle)
@@ -25,8 +23,18 @@ for bundle in ["basic", "ultra"]:
         with open(f) as f_open:
             deps = deps + f_open.readlines()
 
-    # copy all dependencies into bundle output dir
     lib_path = os.path.join(path, "lib")
+    os.makedirs(lib_path, exist_ok=True)
+
+    if cpy_lib_root is None:
+        with open(os.path.join(lib_path, "README.txt"), "w+") as f_open:
+            f_open.write("You will need to copy the following CircuitPython libraries into this directory:\n\n")
+            f_open.writelines(deps)
+            f_open.write("\n\nTo download these libraries, visit: https://circuitpython.org/libraries and download the bundle for version 7.x.\n")
+            f_open.write("If the library ends in '/', you should copy the entire directory.\n")
+        continue
+
+    # copy all dependencies into bundle output dir
     for dep_line in deps:
         dep = dep_line.strip()
         dep_path = os.path.join(cpy_lib_root, dep)
