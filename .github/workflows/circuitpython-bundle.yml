@@ -1,9 +1,10 @@
 name: Bundle CircuitPython Firmware
-on:
-  pull_request:
-    branches: 
-      - main
-    types: [closed]
+# on:
+#   pull_request:
+#     branches: 
+#       - main
+#     types: [closed]
+on: [push]
 jobs:
   Bundle:
     runs-on: ubuntu-latest
