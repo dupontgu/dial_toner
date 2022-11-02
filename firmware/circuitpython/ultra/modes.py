@@ -1,3 +1,4 @@
+import json
 from knobs import read_knob
 from color_util import cmyk_to_rgb, four_bit_hex
 
@@ -76,6 +77,55 @@ class CmykMode:
     def as_rgb(self):
         return cmyk_to_rgb(*self.cmyk)
 
+class PToneMode:
+    def __init__(self):
+        self.rgb = (0,0,0)
+        self.ptone_id = "0000"
+        with open('ptone.json') as file:
+            self.ptone_dict = json.load(file)
+
+    def refresh(self):
+        root_keys = list(self.ptone_dict.keys())
+        root_keys.sort()
+        dig_1 = round(read_knob(0) * (len(root_keys) - 1))
+        dig_1_key = root_keys[dig_1]
+        dig_2_root = self.ptone_dict[dig_1_key]
+        
+        dig_2_keys = list(dig_2_root.keys())
+        dig_2_keys.sort()
+        dig_2 = round(read_knob(1) * (len(dig_2_keys) - 1))
+        dig_2_key = dig_2_keys[dig_2]
+        dig_3_root = dig_2_root[dig_2_key]
+
+        dig_3_keys = list(dig_3_root.keys())
+        dig_3_keys.sort()
+        dig_3 = round(read_knob(2) * (len(dig_3_keys) - 1))
+        dig_3_key = dig_3_keys[dig_3]
+        dig_4_root = dig_3_root[dig_3_key]
+
+        dig_4_keys = list(dig_4_root.keys())
+        dig_4_keys.sort()
+        dig_4 = round(read_knob(3) * (len(dig_4_keys) - 1))
+        dig_4_key = dig_4_keys[dig_4]
+        self.rgb = tuple(dig_4_root[dig_4_key]["c"])
+
+        self.ptone_id = dig_1_key + dig_2_key + dig_3_key + dig_4_key
+
+    def __str__(self):
+        return "P-Tone"
+
+    @property
+    def knob_led_colors(self):
+        return [0x4400ff, 0x4400ff, 0x4400ff, 0x4400ff]
+
+    @property
+    def display(self):
+        return [str(self.ptone_id)]
+
+    @property
+    def as_rgb(self):
+        return self.rgb
+
 class SettingsMode:
     colors = [
         0xff00ff,
@@ -130,5 +180,6 @@ class SettingsMode:
 ALL_INPUT_MODES = [
     HexMode(),
     RgbMode(),
-    CmykMode()
+    CmykMode(),
+    PToneMode()
 ]

@@ -67,6 +67,7 @@ class DialTonerDisplay:
             self.dirty = True
             self.display_group.pop()
             self.logo_showing = False
+            self.last_display = None
 
     def update_text_color(self, bg_color):
         c = (0,0,0) if use_dark_text(bg_color) else (255,255,255)
