@@ -1,5 +1,9 @@
 name: Bundle CircuitPython Firmware
-on: [push]
+on:
+  pull_request:
+    branches: 
+      - main
+    types: [closed]
 jobs:
   Bundle:
     runs-on: ubuntu-latest
@@ -32,3 +36,6 @@ jobs:
         release_name: Release ${{ steps.read_version.outputs.content }}
         body: |
           Artifacts can be found at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Use DT Basic Bundle if you have the standard Dial Toner with 6 hex switches.
+          Use DT Ultra Bundle if you have the Dial Toner Ultra (with the LCD screen).
+          You will need to install the CircuitPython libraries manually. See instructions in /lib/README.txt.
