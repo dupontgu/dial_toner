@@ -8,7 +8,6 @@ import board
 from dt_keyboard import Keyboard
 from led_wrapper import LedWrapper
 from color_util import gamma_correction
-from config import BRIGHTNESS_VALS
 
 btn = PioButton(board.D0, sample_frequency = 10000)
 keyboard = Keyboard()
@@ -91,13 +90,13 @@ while True:
         rgb = new_rgb
         print(hex(rgb))
         pixel.fill(gamma_corrected_rgb_int(rgb))
-        pixel.brightness = BRIGHTNESS_VALS[config.brightness]
+        pixel.brightness = config.brightness_float
         pixel.show()
     time.sleep(0.01)
     if btn.newly_pressed():
         str_value = config.sequence_for_rgb(rgb)
         print("btn pressed:", rgb, str_value)
-        keyboard.write_string(str_value)
+        keyboard.write_string(str_value, config.keyboard_mode_obj)
 
     
 

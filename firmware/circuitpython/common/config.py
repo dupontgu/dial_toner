@@ -1,7 +1,10 @@
 from color_util import *
 from modes import ALL_INPUT_MODES
+from dt_keyboard import ALL_KEYBOARD_MODES
 
 INPUT_VALS = ALL_INPUT_MODES
+
+KEYBOARD_VALS = ALL_KEYBOARD_MODES
 
 OUTPUT_VALS = [
     # export a hex string representation of a color: #FF00FF
@@ -39,13 +42,15 @@ class Config:
         output_mode=0,
         whitespace_mode=0,
         append_key=0,
-        brightness=3
+        brightness=3,
+        keyboard_mode=0
     ):
         self.input_mode = input_mode
         self.output_mode = output_mode
         self.whitespace_mode = whitespace_mode
         self.append_key = append_key
         self.brightness = brightness
+        self.keyboard_mode = keyboard_mode
 
     def __str__(self):
         return "ip={}, op={}, ws={}, ak={}, bright={}".format(self._input_mode, self.output_mode, self.whitespace_mode, self.append_key, self.brightness)
@@ -63,6 +68,21 @@ class Config:
         self._input_mode = value
 
     input_mode = property(lambda s: s._input_mode, set_input_mode)
+
+    @property
+    def input_mode_obj(self):
+        return INPUT_VALS[self._input_mode]
+
+    def set_keyboard_mode(self, value):
+        if value >= len(KEYBOARD_VALS):
+            value = 0
+        self._keyboard_mode = value
+
+    keyboard_mode = property(lambda s: s._keyboard_mode, set_keyboard_mode)
+
+    @property
+    def keyboard_mode_obj(self):
+        return KEYBOARD_VALS[self._keyboard_mode]
 
     def set_output_mode(self, value):
         if value >= len(OUTPUT_VALS):
@@ -84,6 +104,12 @@ class Config:
         self._brightness = value
 
     brightness = property(lambda s: s._brightness, set_brightness)
+
+    @property
+    def brightness_float(self):
+        return BRIGHTNESS_VALS[self._brightness]
+
+    # TODO - move all sequence logic into external classes like input mode/ keyboard modes
 
     def sequence_for_rgb(self, rgb):
         seq = ""

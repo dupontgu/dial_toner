@@ -1,6 +1,4 @@
 
-from color_util import rgb_tuple
-from config import INPUT_VALS
 from dt_display import DialTonerDisplay
 from knobs import any_knob_has_turned_within
 from dt_keyboard import Keyboard
@@ -49,8 +47,8 @@ while True:
         elif button_status.hold_time < 30 and not button_status.pressed:
             str_value = config.sequence_for_rgb(mode.as_rgb)
             print("btn pressed:", mode.as_rgb, str_value)
-            keyboard.write_string(str_value)
-    mode = INPUT_VALS[config.input_mode]
+            keyboard.write_string(str_value, config.keyboard_mode_obj)
+    mode = config.input_mode_obj
     mode.refresh()
     actively_turning = any_knob_has_turned_within(3)
     logo_showing = display.logo_showing
