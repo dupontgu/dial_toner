@@ -20,10 +20,10 @@ def settings_mode():
     display.refresh()
     settings_mode = SettingsMode(read_config(), all_params)
     led_color = (100, 100, 100)
-    set_led_bg_color(led_color)
     hold_released = False
     while True:
         settings_mode.refresh()
+        set_led_bg_color(led_color, settings_mode.config.brightness_float)
         set_all_led_brightness(0 if round(time.monotonic() * 1.5) % 2 == 0 else 0.8)
         for button_status in button.events:
             if not button_status.pressed:
@@ -56,7 +56,7 @@ while True:
         if logo_showing:
             display.hide_logo()
         display.update_with(mode)
-        set_led_bg_color(mode.as_rgb)
+        set_led_bg_color(mode.as_rgb, config.brightness_float)
     elif not logo_showing:
         display.show_logo()
     set_knob_leds(mode.knob_led_colors)
