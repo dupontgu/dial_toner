@@ -3,17 +3,20 @@ from dt_display import DialTonerDisplay
 from knobs import any_knob_has_turned_within
 from dt_keyboard import Keyboard
 from modes import SettingsMode
-from dt_leds import set_all_led_brightness, set_led_bg_color, set_knob_leds
+from dt_leds import set_all_led_brightness, set_led_bg_color, set_knob_leds, DEFAULT_BRIGHTNESS
 import board
 import time
 from persistence import read_config, write_config
 from config_params import all_params
 from pio_button import PioButton
 
+IDLE_TIME_THRESHOLD = 1200
+
 display = DialTonerDisplay()
 keyboard = Keyboard()
 button = PioButton(board.D3)
 config = read_config()
+idle_time = 0
 
 def settings_mode():
     display.hide_logo()
@@ -24,14 +27,14 @@ def settings_mode():
     while True:
         settings_mode.refresh()
         set_led_bg_color(led_color, settings_mode.config.brightness_float)
-        set_all_led_brightness(0 if round(time.monotonic() * 1.5) % 2 == 0 else 0.8)
+        set_all_led_brightness(0 if round(time.monotonic() * 1.5) % 2 == 0 else DEFAULT_BRIGHTNESS)
         for button_status in button.events:
             if not button_status.pressed:
                 if not hold_released:
                     hold_released = True
                     continue
                 write_config(settings_mode.config)
-                set_all_led_brightness(0.8)
+                set_all_led_brightness(DEFAULT_BRIGHTNESS)
                 time.sleep(0.2)
                 return
         display.update_with(settings_mode)
@@ -53,11 +56,21 @@ while True:
     actively_turning = any_knob_has_turned_within(3)
     logo_showing = display.logo_showing
     if actively_turning:
+        if idle_time >= IDLE_TIME_THRESHOLD:
+            set_all_led_brightness(DEFAULT_BRIGHTNESS)
+        idle_time = 0
         if logo_showing:
             display.hide_logo()
         display.update_with(mode)
         set_led_bg_color(mode.as_rgb, config.brightness_float)
-    elif not logo_showing:
+    elif not logo_showing and idle_time < IDLE_TIME_THRESHOLD:
         display.show_logo()
+    else:
+        idle_time += 1
+        if idle_time == IDLE_TIME_THRESHOLD:
+            set_all_led_brightness(0.1)
+            display.hide_logo()
+            display.update_bg_color(0x000)
+            display.refresh(force=True)
     set_knob_leds(mode.knob_led_colors)
     display.refresh()

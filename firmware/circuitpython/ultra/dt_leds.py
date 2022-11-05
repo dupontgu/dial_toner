@@ -1,8 +1,10 @@
 import neopixel
 import board
 
-pixels = neopixel.NeoPixel(board.D4, 5, brightness=0.8, auto_write=False)
-built_in = neopixel.NeoPixel(board.NEOPIXEL, 5, brightness=0.8, auto_write=False)
+DEFAULT_BRIGHTNESS = 0.8
+
+pixels = neopixel.NeoPixel(board.D4, 5, brightness=DEFAULT_BRIGHTNESS, auto_write=False)
+built_in = neopixel.NeoPixel(board.NEOPIXEL, 5, brightness=DEFAULT_BRIGHTNESS, auto_write=False)
 pixels.fill((0, 0, 0))
 pixels.show()
 

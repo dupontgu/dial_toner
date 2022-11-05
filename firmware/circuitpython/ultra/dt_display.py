@@ -87,8 +87,8 @@ class DialTonerDisplay:
         self.color_text_label.y = round((270 - self.color_text_label.height) / 2)
         self.color_text_label.x = round((240 - self.color_text_label.width) / 2)
 
-    def refresh(self):
-        if self.dirty:
+    def refresh(self, force=False):
+        if self.dirty or force:
             self.display.refresh()
             self.dirty = False
 
