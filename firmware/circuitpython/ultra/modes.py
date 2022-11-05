@@ -1,6 +1,12 @@
 import json
 from knobs import read_knob
-from color_util import cmyk_to_rgb, four_bit_hex
+from color_util import cmyk_to_rgb, four_bit_hex, hsl_to_rgb
+
+def format_percentage(percentage):
+    adj_prcnt = percentage * 100
+    if adj_prcnt == 100.0:
+        return "100"
+    return "%04.1f" % adj_prcnt
 
 class HexMode:
     def __init__(self):
@@ -45,6 +51,36 @@ class RgbMode(HexMode):
     def __str__(self):
         return "RGB"
 
+class HslMode:
+    def __init__(self):
+        self.hsl = (0,0,0)
+
+    def refresh(self):
+        self.hsl = (
+            round(read_knob(0) * 359), 
+            read_knob(1), 
+            read_knob(2)
+            )
+
+    def __str__(self):
+        return "HSL"
+
+    @property
+    def knob_led_colors(self):
+        return [0x4455aa, 0x4455aa, 0x4455aa, 0x0]
+
+    @property
+    def display(self):
+        return [
+            "H: " + str(self.hsl[0]),
+            "S: " + format_percentage(self.hsl[1]) + "%",
+            "L: " + format_percentage(self.hsl[2]) + "%",
+            ]
+
+    @property
+    def as_rgb(self):
+        return hsl_to_rgb(*self.hsl)
+
 class CmykMode:
     def __init__(self):
         self.cmyk = (0,0,0,0)
@@ -67,10 +103,10 @@ class CmykMode:
     @property
     def display(self):
         return [
-            "C: " + ("%04.1f" % (self.cmyk[0] * 100)) + "%",
-            "M: " + ("%04.1f" % (self.cmyk[1] * 100)) + "%",
-            "Y: " + ("%04.1f" % (self.cmyk[2] * 100)) + "%",
-            "K: " + ("%04.1f" % (self.cmyk[3] * 100)) + "%",
+            "C: " + format_percentage(self.cmyk[0]) + "%",
+            "M: " + format_percentage(self.cmyk[1]) + "%",
+            "Y: " + format_percentage(self.cmyk[2]) + "%",
+            "K: " + format_percentage(self.cmyk[3]) + "%",
             ]
 
     @property
@@ -149,13 +185,15 @@ class SettingsMode:
         self.param_name = ""
         self.param_value = ""
 
+    def read_knob_safe(self, index):
+        return max(0, read_knob(index) - 0.01)
+
     def refresh(self):
-        safe_knob_value = max(0, read_knob(0) - 0.01)
-        param_index = int(safe_knob_value * len(self.params))
+        param_index = int(self.read_knob_safe(0) * len(self.params))
         active_param = self.params[param_index]
         self.param_name = active_param.name
         self.param_value = str(active_param.values[active_param.get(self.config)])
-        value_index = int(read_knob(1) * len(active_param.values))
+        value_index = int(self.read_knob_safe(1) * len(active_param.values))
         if self.current_param_index != param_index:
             self.current_value_index = value_index
             self.current_param_index = param_index
@@ -172,7 +210,7 @@ class SettingsMode:
 
     @property
     def display(self):
-        return [self.param_name, self.param_value]
+        return [self.param_name + ":", self.param_value]
 
     @property
     def as_rgb(self):
@@ -182,5 +220,6 @@ ALL_INPUT_MODES = [
     HexMode(),
     RgbMode(),
     CmykMode(),
-    PToneMode()
+    PToneMode(),
+    HslMode()
 ]
