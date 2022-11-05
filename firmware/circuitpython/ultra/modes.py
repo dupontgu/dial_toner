@@ -150,7 +150,8 @@ class SettingsMode:
         self.param_value = ""
 
     def refresh(self):
-        param_index = int(read_knob(0) * len(self.params))
+        safe_knob_value = max(0, read_knob(0) - 0.01)
+        param_index = int(safe_knob_value * len(self.params))
         active_param = self.params[param_index]
         self.param_name = active_param.name
         self.param_value = str(active_param.values[active_param.get(self.config)])
