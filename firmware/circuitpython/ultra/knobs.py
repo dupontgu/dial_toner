@@ -24,7 +24,7 @@ def read_knob(index):
         knob_update_times[index] = time.monotonic()
     else: 
         reading = cached_knob_values[index]
-    return min(1, 1.025 * max(0, ((65536 - reading) / 65536) - 0.02))
+    return min(1, 1.03 * max(0, ((65536 - reading) / 65536) - 0.02))
 
 def any_knob_has_turned_within(threshold_sec):
     thresh_time = time.monotonic() - threshold_sec
