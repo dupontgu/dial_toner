@@ -56,7 +56,6 @@ def config_mode_selection_made():
         pixel.fill(colorwheel_color())
         # blink at selected brightness
         computed_brightness = BRIGHTNESS_VALS[get_brightness_from_bytes(reading)]
-        print("computed_brightness", computed_brightness)
         pixel.brightness = 0 if int(time.monotonic() * 6) % 2 == 0 else computed_brightness
         pixel.show()
         time.sleep(0.001)

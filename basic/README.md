@@ -1,6 +1,8 @@
 # The Dial Toner (Basic)
 
-## Basic Usage
+![Dial Toner Rev02 Board](../.docs/dial_toner.jpg)
+
+## General Usage
 1. Connect the Dial Toner to your computer via USB.
 2. Dial in a hex color using the 6 knobs. (Note - the engraved line on top of the knob points to the selected value. There is a small circuilar impression on the _left_ sign of the line.)
 3. Observe that the color of the LED (roughly) matches the color you have chosen.
@@ -20,8 +22,7 @@
 
     1. **The fourth knob dials in LED brightness**. 0-F on the knob dials in the brightness percentage from ~0-80% (anything brighter is a bit much). Keep in mind - if you turn the brightness to 0, you will not see the light anymore! Probably a stupid feature, but somebody suggested that it might be fun to play a game where you pick a color and see how close you can dial it in without seeing it. 
 
-    1. **The fifth knob changes the keyboard layout**. The possible values are 0 for "US", 1 for "UK" (switches '#' and '£'), and 2 for "INTL" (should work for most other layouts).
-    Any other value defaults to "US".
+    1. **The fifth knob changes the keyboard layout**. The possible values are 0 for United States English, 1 for British English (switches '#' and '£'), and 2 for "International" (should work for most other layouts). Any other selected value defaults to "US".
 
 ## Changing/Updating the Firmware:
 - This device runs [CircuitPython](https://circuitpython.org/). It’s a really great way to get started with embedded software development. All of the code that powers this device is available on the device for you to play around with. 
@@ -45,4 +46,6 @@
     1. Change the line that says “DEBUG = False” to say “DEBUG = True”.
     1. Save the boot.py file.
     1. Reboot the device - it should stay in Debug mode as long as “DEBUG = True”.
+
+- You can [change the name](https://learn.adafruit.com/welcome-to-circuitpython/renaming-circuitpy) of the `CIRCUITPY` drive if you want to.
 
