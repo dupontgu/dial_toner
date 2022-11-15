@@ -1,0 +1,4 @@
+neopixel.mpy
+adafruit_hid/
+adafruit_pioasm.mpy
+adafruit_ticks.mpy

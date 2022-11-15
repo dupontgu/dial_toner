@@ -1,9 +1,4 @@
 # CircuitPython firmware for The Dial Toner
-- Tested with CircuitPython version 7.2.x and 7.3.x
-- Designed to run on the Seeeduino XIAO RP2040, but _should_ run on any of the Seeeduino XIAO series of dev boards.
-- You will need to include the following Adafruit CircuitPython libraries in order for this code to run:
-  - `adafruit_hid`
-  - `adafruit_pixelbuf.mpy`
-  - `neopixel.mpy`
-- Note that there is a variable called `DEBUG` in boot.py. I have it defaulting to True, but if you flip it, the XIAO will stop showing up as a storage device.
-- //TODO link to usage instructions
+- **This directory contains the code for all models of The Dial Toner**. Shared code lives in the [common](./circuitpython/common/) directory. Other directories contain hardware model-specific code. The [`bundle`](./circuitpython/bundle.py) script will create bundles for each model. The contents of each bundle can be loaded onto the corresponding device wholesale - all existing files should be overwritten. The bundle script also pulls in the necessary dependencies from Adafruit's CircuitPython library bundle.
+- All code is currently written for CircuitPython 7. It has been tested on most 7.x releases since 7.2.5.
+- All Dial Toner models are currently built around the [Seeeduino XIAO RP2040](https://www.seeedstudio.com/XIAO-RP2040-v1-0-p-5026.html) development board.

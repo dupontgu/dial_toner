@@ -1,0 +1,41 @@
+name: Bundle CircuitPython Firmware
+on:
+  pull_request:
+    branches: 
+      - main
+    types: [closed]
+jobs:
+  Bundle:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Read Version
+      id: read_version
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: ./firmware/circuitpython/version.txt
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+    - run: pip install python-dotenv
+    - run: pip install requests
+    - name: Python Bundle
+      working-directory: ./firmware/circuitpython
+      run: python bundle.py
+    - uses: actions/upload-artifact@v3
+      with:
+        name: DT Basic Bundle - ${{ steps.read_version.outputs.content }}
+        path: ./firmware/circuitpython/bundle/basic/
+    - uses: actions/upload-artifact@v3
+      with:
+        name: DT Ultra Bundle - ${{ steps.read_version.outputs.content }}
+        path: ./firmware/circuitpython/bundle/ultra/
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.read_version.outputs.content }}
+        release_name: Release ${{ steps.read_version.outputs.content }}
+        body: |
+          Artifacts can be found at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Use DT Basic Bundle if you have the standard Dial Toner with 6 hex switches.
+          Use DT Ultra Bundle if you have the Dial Toner Ultra (with the LCD screen).

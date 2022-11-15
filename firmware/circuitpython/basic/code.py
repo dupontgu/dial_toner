@@ -1,14 +1,16 @@
 
 import time
 from persistence import get_reboot_button_count, read_config, set_reboot_button_count, write_config
-from button import Button
+from pio_button import PioButton
 from rainbowio import colorwheel
 import hex_input
+import board
 from dt_keyboard import Keyboard
 from led_wrapper import LedWrapper
 from color_util import gamma_correction
+from config import BRIGHTNESS_VALS
 
-btn = Button()
+btn = PioButton(board.D0, sample_frequency = 10000)
 keyboard = Keyboard()
 pixel = LedWrapper()
 
@@ -17,9 +19,10 @@ colorwheel_count =  0
 config = read_config()
 write_config(config)
 
+# get the latest colorwheel color, move cursor so it's different next time.
 def colorwheel_color():
     global colorwheel_count
-    colorwheel_count += 0.2
+    colorwheel_count += 0.4
     if colorwheel_count > 255:
         colorwheel_count = 0
     return colorwheel(colorwheel_count)
@@ -35,14 +38,17 @@ def gamma_corrected_rgb_int(rgb_int):
     return gamma_correction[r] << 16 | gamma_correction[g] << 8 | gamma_correction[b]
 
 def get_brightness_from_bytes(bytes):
-    # divisor scales the brightness down, should be at least 16
-    return ((bytes[1] & 0x0F) / 32)
+    return round(((bytes[1] & 0x0F) / 16) * 10)
 
 def commit_config_selection(bytes):
+    # first knob, first nibble
     config.output_mode = bytes[0] >> 4
+    # second knob, second nibble
     config.whitespace_mode = bytes[0] & 0x0F
+    # etc
     config.append_key = bytes[1] >> 4
     config.brightness = get_brightness_from_bytes(bytes)
+    config.keyboard_mode = bytes[2] >> 4
     write_config(config)
     print(config)
 
@@ -51,37 +57,34 @@ def config_mode_selection_made():
         reading = hex_input.read_bytes()
         if btn.newly_pressed():
             return commit_config_selection(reading)
-        btn.update()
         pixel.fill(colorwheel_color())
         # blink at selected brightness
-        pixel.brightness = 0 if int(time.monotonic() * 4) % 2 == 0 else get_brightness_from_bytes(reading)
+        computed_brightness = BRIGHTNESS_VALS[get_brightness_from_bytes(reading)]
+        pixel.brightness = 0 if int(time.monotonic() * 6) % 2 == 0 else computed_brightness
         pixel.show()
         time.sleep(0.001)
 
+# blocks until user exits config mode
 def config_mode():
     pixel.brightness = config.brightness
     starting_bytes = hex_input.read_bytes()
     while True:
         reading = hex_input.read_bytes()
+        btn_press = btn.newly_pressed()
         if reading != starting_bytes:
             return config_mode_selection_made()
-        elif btn.newly_pressed():
+        elif btn_press:
             return None
-        btn.update()
         # slow pulse
         pixel.fill(colorwheel_color())
         pixel.show()
         time.sleep(0.001)
 
 if btn.newly_pressed():
-    button_count = get_reboot_button_count() + 1
-    if button_count == 1:
-        set_reboot_button_count(1)
+    if get_reboot_button_count() == 1:
         # this will block until user exits config mode  
         config_mode()
         set_reboot_button_count(0)
-else:
-    set_reboot_button_count(0)
 
 print("config: ", config)
 
@@ -93,14 +96,13 @@ while True:
         rgb = new_rgb
         print(hex(rgb))
         pixel.fill(gamma_corrected_rgb_int(rgb))
-        pixel.brightness = config.brightness
+        pixel.brightness = config.brightness_float
         pixel.show()
-    btn.update()
     time.sleep(0.01)
     if btn.newly_pressed():
         str_value = config.sequence_for_rgb(rgb)
         print("btn pressed:", rgb, str_value)
-        keyboard.write_string(str_value)
+        keyboard.write_string(str_value, config.keyboard_mode_obj)
 
     
 

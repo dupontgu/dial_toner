@@ -1,13 +1,12 @@
 
 RGB_SCALE = 255
-CMYK_SCALE = 100
+CMYK_SCALE = 1
 
 def rgb_tuple(rgb_int):
     r = (rgb_int >> 16) & 0xFF
     g = (rgb_int >> 8) & 0xFF
     b = rgb_int & 0xFF
     return (r, g, b)
-
 
 # returns a 2 character string, representing the least significant nibble
 # 0 -> "00"
@@ -55,6 +54,33 @@ def rgb_to_hsl(r, g, b):
 
     return (h, s, l)
 
+def hsl_to_rgb(h, s, l):
+    c = (1 - abs(2 * l - 1)) * s
+    x = c * (1 - abs((h / 60) % 2 - 1))
+    m = l - c/2
+    r = 0
+    g = 0
+    b = 0
+
+    if (0 <= h and h < 60):
+        r = c; g = x; b = 0;  
+    elif (60 <= h and h < 120):
+        r = x; g = c; b = 0
+    elif (120 <= h and h < 180):
+        r = 0; g = c; b = x
+    elif (180 <= h and h < 240):
+        r = 0; g = x; b = c
+    elif (240 <= h and h < 300):
+        r = x; g = 0; b = c
+    elif (300 <= h and h < 360):
+        r = c; g = 0; b = x
+  
+    r = round((r + m) * 255);
+    g = round((g + m) * 255);
+    b = round((b + m) * 255);
+
+    return (r, g, b)
+
 
 # yoinked from https://stackoverflow.com/a/14088415
 def rgb_to_cmyk(r, g, b):
@@ -76,6 +102,17 @@ def rgb_to_cmyk(r, g, b):
 
     # rescale to the range [0,CMYK_SCALE]
     return c * CMYK_SCALE, m * CMYK_SCALE, y * CMYK_SCALE, k * CMYK_SCALE
+
+def cmyk_to_rgb(c, m, y, k):
+    r = RGB_SCALE * (1.0 - c / float(CMYK_SCALE)) * (1.0 - k / float(CMYK_SCALE))
+    g = RGB_SCALE * (1.0 - m / float(CMYK_SCALE)) * (1.0 - k / float(CMYK_SCALE))
+    b = RGB_SCALE * (1.0 - y / float(CMYK_SCALE)) * (1.0 - k / float(CMYK_SCALE))
+    return round(r), round(g), round(b)
+
+def use_dark_text(rgb_tuple):
+    (r, g, b) = rgb_tuple
+    sum = ((r * 0.299) + (g * 0.587) + (b * 0.114))
+    return sum > 140
 
 # yoinked from https://learn.adafruit.com/led-tricks-gamma-correction/the-quick-fix
 gamma_correction = [
