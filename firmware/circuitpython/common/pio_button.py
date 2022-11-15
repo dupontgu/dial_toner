@@ -19,6 +19,9 @@ class ButtonState:
     def __str__(self):
         return "pressed={}, hold_count={}".format(self.pressed, self.hold_time)
 
+# Reads input from onboard button by sampling pin via PIO
+# Allows us to sample in the "background" into a buffer, and then process input events when we're unblocked
+# Context - the "ultra" version of the DT has screen updates that block for upwards of ~0.5 seconds. This is plenty of time to miss a button press.
 class PioButton:
     def __init__(self, pin, sample_frequency=5000):
         self.sm = rp2pio.StateMachine(

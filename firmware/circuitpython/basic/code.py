@@ -19,6 +19,7 @@ colorwheel_count =  0
 config = read_config()
 write_config(config)
 
+# get the latest colorwheel color, move cursor so it's different next time.
 def colorwheel_color():
     global colorwheel_count
     colorwheel_count += 0.4
@@ -40,8 +41,11 @@ def get_brightness_from_bytes(bytes):
     return round(((bytes[1] & 0x0F) / 16) * 10)
 
 def commit_config_selection(bytes):
+    # first knob, first nibble
     config.output_mode = bytes[0] >> 4
+    # second knob, second nibble
     config.whitespace_mode = bytes[0] & 0x0F
+    # etc
     config.append_key = bytes[1] >> 4
     config.brightness = get_brightness_from_bytes(bytes)
     config.keyboard_mode = bytes[2] >> 4
@@ -60,6 +64,7 @@ def config_mode_selection_made():
         pixel.show()
         time.sleep(0.001)
 
+# blocks until user exits config mode
 def config_mode():
     pixel.brightness = config.brightness
     starting_bytes = hex_input.read_bytes()

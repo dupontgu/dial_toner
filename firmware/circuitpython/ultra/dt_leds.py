@@ -3,7 +3,9 @@ import board
 
 DEFAULT_BRIGHTNESS = 0.8
 
+# WS2812 under the button
 pixels = neopixel.NeoPixel(board.D4, 5, brightness=DEFAULT_BRIGHTNESS, auto_write=False)
+# WS2812 built into the dev board
 built_in = neopixel.NeoPixel(board.NEOPIXEL, 5, brightness=DEFAULT_BRIGHTNESS, auto_write=False)
 pixels.fill((0, 0, 0))
 pixels.show()

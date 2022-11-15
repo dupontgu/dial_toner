@@ -14,11 +14,13 @@ class Keyboard():
 
 class UsKeyboardMode:
     def write(self, str, ada_keyboard, keyboard_layout):
+        # since underlying adafruit keyboard_layout is US based, we don't need to change anything here
         keyboard_layout.write(str)
 
     def __str__(self):
         return "US"
 
+# compared to US mode, this reverses the '#' and '£' symbols.
 class BritishKeyboardMode:
     def write(self, str, ada_keyboard, keyboard_layout):
         if str[0] == '#':

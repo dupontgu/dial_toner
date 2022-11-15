@@ -6,6 +6,10 @@ from digitalio import DigitalInOut, Direction
 KNOB_COUNT = 4
 KNOB_UPDATE_THRESHOLD = 500
 
+# Hardware uses a 74x4052 multiplexer to read knobs.
+# poll 4 potentiometers using 2 bit addresses. 
+# output of 4052 is read by board.A0.
+
 analog_in = AnalogIn(board.A0)
 addr_0 = DigitalInOut(board.D1)
 addr_0.direction = Direction.OUTPUT
@@ -24,6 +28,7 @@ def read_knob(index):
         knob_update_times[index] = time.monotonic()
     else: 
         reading = cached_knob_values[index]
+    # slightly stretch range to compensate for hardware. Ensures that knob all the way down == 0.0 and knob all the way up == 1.0
     return min(1, 1.03 * max(0, ((65536 - reading) / 65536) - 0.02))
 
 def any_knob_has_turned_within(threshold_sec):

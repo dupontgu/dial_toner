@@ -117,10 +117,12 @@ class PToneMode:
     def __init__(self):
         self.rgb = (0,0,0)
         self.ptone_id = "0000"
+        # values pulled from https://www.pantone-colours.com/
         with open('ptone.json') as file:
             self.ptone_dict = json.load(file)
 
     def refresh(self):
+        # This all feels pretty inefficient since we have to sort multimple times, but lists max out at n = 10 so whatever
         root_keys = list(self.ptone_dict.keys())
         root_keys.sort()
         dig_1 = round(read_knob(0) * (len(root_keys) - 1))

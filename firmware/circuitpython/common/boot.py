@@ -13,6 +13,7 @@ if btn.newly_pressed():
     print("button pressed during boot...")
     button_count = get_reboot_button_count() + 1
     set_reboot_button_count(button_count)
+    # if the user was holding the button down over the course of 2 reboots, enable CIRCUITPY drive
     if button_count == 2:
         storage.enable_usb_drive()
     print("button count: ", button_count)

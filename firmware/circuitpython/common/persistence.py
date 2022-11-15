@@ -10,12 +10,15 @@ CONF_BRIGHTNESS = 5
 CONF_IP_MODE = 6
 CONF_KEYBOARD_MODE = 7
 
-# write this immediately
-# migrations can go here, if necessary
+
+
+# run migrations here
 if microcontroller.nvm[CONF_VERSION] == 1:
     # used to be stored from 0-255, reduced options from 0-10. Default to low-ish value.
     microcontroller.nvm[CONF_BRIGHTNESS] = 3
     print("migrating from persistance 1 -> 2")
+
+# write this immediately after migrations
 microcontroller.nvm[CONF_VERSION] = 2
 
 def write_config(config):
@@ -28,6 +31,7 @@ def write_config(config):
 
 def read_config():
     output_mode = microcontroller.nvm[CONF_OP_MODE]
+    # indicates that config has never been persisted, so return all default values
     if output_mode == 0xFF:
         return Config()
     whitespace_mode = microcontroller.nvm[CONF_WS_MODE]
