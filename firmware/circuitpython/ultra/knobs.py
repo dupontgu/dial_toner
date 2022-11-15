@@ -4,7 +4,7 @@ from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction
 
 KNOB_COUNT = 4
-KNOB_UPDATE_THRESHOLD = 500
+KNOB_UPDATE_THRESHOLD = 550
 
 # Hardware uses a 74x4052 multiplexer to read knobs.
 # poll 4 potentiometers using 2 bit addresses. 
@@ -21,7 +21,14 @@ knob_update_times = [0] * KNOB_COUNT
 
 def read_knob(index):
     set_mux_addr(index)
-    reading = analog_in.value
+    reading = 0
+    # little bit of jitter on the knobs, so smoothe out the reading.
+    reading += analog_in.value
+    reading += analog_in.value
+    reading += analog_in.value
+    reading += analog_in.value
+    reading = reading / 4
+
     # If the knob's value is far enough away from the last reading, mark it's last-updated-time as now
     if (abs(reading - cached_knob_values[index])) >= KNOB_UPDATE_THRESHOLD:
         cached_knob_values[index] = reading
