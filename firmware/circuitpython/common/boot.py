@@ -3,7 +3,7 @@ from persistence import get_reboot_button_count, set_reboot_button_count
 import storage
 import board
 
-DEBUG = True
+DEBUG = False
 
 if not DEBUG:
     storage.disable_usb_drive()
