@@ -32,6 +32,7 @@ for bundle in ["basic", "ultra"]:
     shutil.copytree("common", path, dirs_exist_ok=True)
     # copy all bundle-specific files to bundle output dir
     shutil.copytree(bundle, path, dirs_exist_ok=True)
+    shutil.copy("version.txt", path)
 
     # create combined list of common and bundle-specific dependencies
     deps = []
